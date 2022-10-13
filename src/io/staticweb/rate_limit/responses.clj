@@ -19,10 +19,12 @@
   (assoc rsp ::rate-limit-applied quota-state))
 
 (defn add-retry-after-header
-  [rsp ^java.time.Duration retry-after]
-  (assoc-in rsp
-            [:headers "Retry-After"]
-            (str (.getSeconds retry-after))))
+  [rsp ^java.time.Instant retry-after]
+  (let [duration (java.time.Duration/between (java.time.Instant/now)
+                                             retry-after)]
+    (assoc-in rsp
+              [:headers "Retry-After"]
+              (str (.getSeconds duration)))))
 
 (defn too-many-requests-response
   ([retry-after]
